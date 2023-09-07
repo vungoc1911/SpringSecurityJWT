@@ -19,7 +19,7 @@ public class JwtTokenProvider {
 
     // thời gian hết han
     @Value("{ra.jwt.expiration}")
-    private int JWT_EXPIRATION;
+    private String JWT_EXPIRATION;
 
     // tạo jwt từ thông tin của user
     public String generateToken(CustomUserDetail customUserDetail) {

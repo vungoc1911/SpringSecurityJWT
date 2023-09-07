@@ -6,5 +6,5 @@ import com.example.springsecurity.Entity.Roles;
 import java.util.Optional;
 
 public interface RoleService {
-    Optional<Roles> findByRoleName(String roleName);
+    Optional<Roles> findByRoleName(Role roleName);
 }

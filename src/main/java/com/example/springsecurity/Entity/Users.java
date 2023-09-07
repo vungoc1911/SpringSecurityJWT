@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -21,7 +23,7 @@ public class Users {
     private int userId;
     private String userName;
     private String passWord;
-    private Date createDate;
+    private LocalDate createDate;
     private boolean status;
     private String phone;
     private String email;
