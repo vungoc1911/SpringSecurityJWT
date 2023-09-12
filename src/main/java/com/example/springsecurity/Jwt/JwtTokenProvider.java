@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.security.KeyPairGenerator;
 import java.util.Date;
 
 @Component
@@ -18,8 +19,8 @@ public class JwtTokenProvider {
     private String JWT_SECRET;
 
     // thời gian hết han
-    @Value("{ra.jwt.expiration}")
-    private String JWT_EXPIRATION;
+    @Value("${ra.jwt.expiration}")
+    private long JWT_EXPIRATION;
 
     // tạo jwt từ thông tin của user
     public String generateToken(CustomUserDetail customUserDetail) {
@@ -29,7 +30,7 @@ public class JwtTokenProvider {
                 .setSubject(customUserDetail.getUsername()) // set thông tin username
                 .setExpiration(dateExpiration) // set thời gian het hạn
                 .setIssuedAt(now) // set thoi gian bat dau có hiệu lực
-                .signWith(SignatureAlgorithm.ES512, JWT_SECRET) // giải thuật mã hóa
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET) // giải thuật mã hóa
                 .compact();
     }
 
@@ -40,6 +41,7 @@ public class JwtTokenProvider {
         // trả ra userName
         return claims.getSubject();
     }
+
 
     // Validate Token
     public boolean validateToken(String token) {
@@ -57,5 +59,5 @@ public class JwtTokenProvider {
             log.error("JWT String is empty");
         }
         return false;
-     }
+    }
 }

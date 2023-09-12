@@ -4,21 +4,30 @@ import com.example.springsecurity.Entity.Role;
 import com.example.springsecurity.Entity.Roles;
 import com.example.springsecurity.Entity.Users;
 import com.example.springsecurity.Jwt.JwtTokenProvider;
+import com.example.springsecurity.Payload.Request.LoginRequest;
 import com.example.springsecurity.Payload.Request.SignUpRequest;
+import com.example.springsecurity.Payload.Response.JwtResponse;
 import com.example.springsecurity.Payload.Response.MessageResponse;
+import com.example.springsecurity.Security.CustomUserDetail;
 import com.example.springsecurity.Service.RoleService;
 import com.example.springsecurity.Service.UserService;
 import org.apache.logging.log4j.message.MapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @CrossOrigin("*")
 @RestController
@@ -75,5 +84,19 @@ public class UserController {
         users.setRoles(listRoles);
         userService.saveOrUpdate(users);
         return ResponseEntity.ok(new MessageResponse("success"));
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassWord())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+        // sinh jwt trả về
+        String jwt = jwtTokenProvider.generateToken(customUserDetail);
+        // lấy danh sách các quyền
+        List<String> listRoles = customUserDetail.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
+        return ResponseEntity.ok(new JwtResponse(jwt, customUserDetail.getUsername(), customUserDetail.getEmail(), customUserDetail.getPhone(), listRoles));
     }
 }
